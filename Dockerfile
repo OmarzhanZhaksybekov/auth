@@ -1,30 +1,10 @@
-# Используем официальный образ golang для сборки
-FROM golang:1.21.1 AS builder
+FROM golang:latest
 
-# Устанавливаем рабочую директорию внутри контейнера
-WORKDIR /app
+COPY ./ ./
 
-# Копируем go.mod и go.sum и загружаем зависимости
-COPY go.mod go.sum ./
 RUN go mod download
+RUN go build -o app ./cmd/main.go
 
-# Копируем остальные файлы проекта в контейнер
-COPY . .
+RUN chmod +x wait-for-postgres.sh
 
-# Собираем проект
-RUN go build -o main ./cmd/main.go
-
-# Используем минималистичный образ для выполнения
-FROM alpine:latest
-
-# Устанавливаем рабочую директорию для финального контейнера
-WORKDIR /root/
-
-# Копируем скомпилированный бинарный файл из предыдущего контейнера
-COPY --from=builder /app/main .
-
-# Копируем конфигурационный файл из папки config
-COPY config/config.yaml ./config.yaml
-
-# Указываем команду для запуска приложения
-CMD ["main"]
+CMD ["./app"]
