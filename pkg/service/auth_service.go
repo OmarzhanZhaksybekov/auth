@@ -53,6 +53,7 @@ func (s *AuthService) GenerateToken(email, password string) (string, error) {
 	return token.SignedString([]byte(key))
 }
 
+// Hash function for password
 func generateHash(password string) string {
 	hash := sha1.New()
 	hash.Write([]byte(password))
