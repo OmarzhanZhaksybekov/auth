@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	app "github.com/ShawaDev/auth"
@@ -9,20 +8,22 @@ import (
 	"github.com/ShawaDev/auth/pkg/repository"
 	"github.com/ShawaDev/auth/pkg/service"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 func main() {
 	server := new(app.Server)
+	logrus.SetFormatter(new(logrus.JSONFormatter))
 
 	//Enabling env varibales
 	if err := godotenv.Load(); err != nil {
-		fmt.Print(err)
+		logrus.Fatal(err)
 	}
 
 	//Enabling config
 	if err := InitConfig(); err != nil {
-		fmt.Print(err)
+		logrus.Fatal(err)
 	}
 
 	//Connecting to DB
@@ -36,7 +37,7 @@ func main() {
 	})
 
 	if err != nil {
-		fmt.Print(err)
+		logrus.Fatal(err)
 	}
 
 	repo := repository.NewRepository(db)
@@ -45,7 +46,7 @@ func main() {
 
 	//Running server on port from config
 	if err := server.Run(viper.GetString("port"), handler.InitRoutes()); err != nil {
-		fmt.Print(err)
+		logrus.Fatal(err)
 	}
 }
 

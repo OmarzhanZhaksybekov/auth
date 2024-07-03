@@ -34,7 +34,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	token, err := h.service.GenerateToken(user.Email, user.Password)
+	token, role, err := h.service.GenerateToken(user.Email, user.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, err)
 		return
@@ -42,6 +42,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
+		"role":  role,
 	})
 
 }

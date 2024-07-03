@@ -8,7 +8,7 @@ import (
 // service for authorization
 type Authorization interface {
 	CreateUser(user model.User) (int, error)
-	GenerateToken(email, password string) (string, error)
+	GenerateToken(email, password string) (string, string, error)
 }
 
 type Service struct {

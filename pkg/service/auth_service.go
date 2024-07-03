@@ -2,6 +2,7 @@ package service
 
 import (
 	"crypto/sha1"
+	"errors"
 	"fmt"
 	"time"
 
@@ -37,10 +38,18 @@ func (s *AuthService) CreateUser(user model.User) (int, error) {
 	return s.repo.CreateUser(user)
 }
 
-func (s *AuthService) GenerateToken(email, password string) (string, error) {
+func (s *AuthService) GenerateToken(email, password string) (string, string, error) {
+	if s.repo == nil {
+		return "", "", errors.New("repository is not initialized")
+	}
+
 	user, err := s.repo.GetUser(email, generateHash(password))
 	if err != nil {
-		return "", err
+		return "", "", err
+	}
+
+	if user.Id == 0 || user.Role == "" {
+		return "", "", errors.New("invalid user data")
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -50,7 +59,14 @@ func (s *AuthService) GenerateToken(email, password string) (string, error) {
 		"iat":     time.Now().Unix(),
 	})
 
-	return token.SignedString([]byte(key))
+	if key == "" {
+		return "", "", errors.New("signing key is not initialized")
+	}
+
+	accessToken, err := token.SignedString([]byte(key))
+
+	return accessToken, user.Role, err
+
 }
 
 // Hash function for password
