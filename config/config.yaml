@@ -1,6 +1,6 @@
 port: "8002"
 db:
-  host: "db"
+  host: "dbS"
   port: "5432"
   user: "postgres"
   dbname: "dealer"
